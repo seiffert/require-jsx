@@ -1,4 +1,4 @@
-define(['JSXTransformer', 'react'], function (JSXTransformer, react) {
+define(['JSXTransformer'], function (JSXTransformer) {
     'use strict';
     
     var fs, getXhr,
@@ -8,42 +8,52 @@ define(['JSXTransformer', 'react'], function (JSXTransformer, react) {
         },
         buildMap = {};
  
-    getXhr = function () {
-        var xhr, i, progId;
-        if (typeof XMLHttpRequest !== "undefined") {
-            return new XMLHttpRequest();
-        } else {
-            for (i = 0; i < 3; i += 1) {
-                progId = progIds[i];
-                try {
-                    xhr = new ActiveXObject(progId);
-                } catch (e) {}
+    if (typeof process !== "undefined" &&
+               process.versions &&
+               !!process.versions.node) {
+        //Using special require.nodeRequire, something added by r.js.
+        fs = require.nodeRequire('fs');
+        fetchText = function (path, callback) {
+            callback(fs.readFileSync(path, 'utf8'));
+        };
+    } else {
+        getXhr = function () {
+            var xhr, i, progId;
+            if (typeof XMLHttpRequest !== "undefined") {
+                return new XMLHttpRequest();
+            } else {
+                for (i = 0; i < 3; i += 1) {
+                    progId = progIds[i];
+                    try {
+                        xhr = new ActiveXObject(progId);
+                    } catch (e) {}
 
-                if (xhr) {
-                    progIds = [progId];  // so faster next time
-                    break;
+                    if (xhr) {
+                        progIds = [progId];  // so faster next time
+                        break;
+                    }
                 }
             }
-        }
 
-        if (!xhr) {
-            throw new Error("getXhr(): XMLHttpRequest not available");
-        }
-
-        return xhr;
-    };
-
-    fetchText = function (url, callback) {
-        var xhr = getXhr();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function (evt) {
-            if (xhr.readyState === 4) {
-                callback(xhr.responseText);
+            if (!xhr) {
+                throw new Error("getXhr(): XMLHttpRequest not available");
             }
+
+            return xhr;
         };
-        xhr.send(null);
-    };
- 
+
+        fetchText = function (url, callback) {
+            var xhr = getXhr();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function (evt) {
+                if (xhr.readyState === 4) {
+                    callback(xhr.responseText);
+                }
+            };
+            xhr.send(null);
+        };
+    }
+    
     return {
         write: function (pluginName, name, write) {
             if (buildMap.hasOwnProperty(name)) {
@@ -59,7 +69,11 @@ define(['JSXTransformer', 'react'], function (JSXTransformer, react) {
             fetchText(path, function (text) {
                 try {
                     if (-1 === text.indexOf('React.DOM')) {
-                        text = '/** @jsx React.DOM */' + text;
+                        text =
+                          '/**' + "\n"
+                          + ' * @jsx React.DOM' + "\n"
+                          + ' */' + "\n"
+                          + text;
                     }
                     
                     text = JSXTransformer.transform(text).code;
