@@ -38,5 +38,8 @@ Then, you can reference JSX files via the `jsx!` plugin syntax. For example, to 
 the `router.js` file that is in your `app` directory:
 
     require(['jsx!app/router'], function (Router) {
-
+        
     });
+
+The Plugin is then going to load the JavaScript source file `app/router.js`, parse it with Facebook's JSXTransformer 
+and execute the resulting JavaScript source.
