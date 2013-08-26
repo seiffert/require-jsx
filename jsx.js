@@ -81,6 +81,10 @@ define(['JSXTransformer'], function (JSXTransformer) {
                     err.message = "In " + path + ", " + err.message;
                     throw err;
                 }
+                
+                if (config.isBuild) {
+                    buildMap[name] = text;
+                }
  
                 load.fromText(text);
             });
