@@ -7,7 +7,7 @@ This is helpful when using [React](http://facebook.github.io/react/index.html) w
 
 ## Install <a name="install"></a>
 
-Download the plugin [here](https://raw.github.com/seiffert/require-jsx/master/extras/jsx.js)
+Download the plugin [here](https://github.com/seiffert/require-jsx/raw/master/jsx.js)
 
 Place this in the directory that is your
 [baseUrl](http://requirejs.org/docs/api.html#config-baseUrl) for your project,
