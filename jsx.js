@@ -76,7 +76,7 @@ define(['JSXTransformer'], function (JSXTransformer) {
                           + text;
                     }
                     
-                    text = JSXTransformer.transform(text).code;
+                    text = JSXTransformer.transform(text, { harmony: true }).code;
                 } catch (err) {
                     err.message = "In " + path + ", " + err.message;
                     throw err;
